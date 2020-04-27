@@ -90,3 +90,20 @@ impl Guess {
         Guess { value }
     }
 }
+
+// TODO
+
+// Implement reading the snippet file and create a list or vector with the snippet words
+
+// Path 1:
+
+// Export that list to a python module which then uses the list to generate auto completion
+// snippet.analyze("path/to/file","regex","optional_parameter:return_formart")
+// return_format could be a json object, it defaults to a raw Vec which I assume is converted
+// to a dict or list in python.
+
+// Path 2:
+
+// Impliment the auto completion as a part of the rust code as well, so all you call in python would be 
+// snippet.analyze("path/to/file","regex","optional_parameter:return_formart")
+// then based on the match we pass it to rust code that auto completes and returns a string on enter or something.
