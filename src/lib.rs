@@ -101,6 +101,7 @@ impl Guess {
 // snippet.analyze("path/to/file","regex","optional_parameter:return_formart")
 // return_format could be a json object, it defaults to a raw Vec which I assume is converted
 // to a dict or list in python.
+// The auto completion is then handled in python(already implemented).
 
 // Path 2:
 
