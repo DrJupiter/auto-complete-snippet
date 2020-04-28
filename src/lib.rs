@@ -105,6 +105,20 @@ impl Guess {
 
 // Path 2:
 
-// Impliment the auto completion as a part of the rust code as well, so all you call in python would be 
+// Implement the auto completion as a part of the rust code as well, so all you call in python would be 
 // snippet.analyze("path/to/file","regex","optional_parameter:return_formart")
 // then based on the match we pass it to rust code that auto completes and returns a string on enter or something.
+
+// In both cases I have to implement a file searcher which searches line by line after a certain
+// criteria. 
+
+fn pattern_finder(file: Buffer, pattern: regex) -> Vec::<str> {
+    todo!()
+}
+
+fn sorter(complete_options: Vec::<str>, current_text: mut String) -> String {
+todo!()
+}
+
+// Possibly look into vim pop up menus, but I'm pretty sure that could just be implemented in rust
+// or python pretty easily.
