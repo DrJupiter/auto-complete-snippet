@@ -62,6 +62,7 @@ mod tests {
 
     #[test]
     fn read_lines_test() {
+
         if let Ok(lines) = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets") {
             for line in lines {
                 if let Ok(_current_line) = line {
@@ -74,14 +75,11 @@ mod tests {
 
     #[test]
     fn pattern_vec_creation() {
-        let mut file_buffer = read_lines("/home/winter/.config/nvim/UltiSnips/tex.snippets");
+        let mut file_buffer = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets");
         vec_from_pattern(&mut file_buffer);
     }
 }
 
-extern crate regex;
-
-use regex::Regex;
 
 #[derive(Debug)]
 struct Triangle {
@@ -151,9 +149,12 @@ impl Guess {
 // Normal
 // snippet fmindskningafintensitet "I prop to k"
 
+
+use regex::Regex;
+
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::Path;
+use std::path::{Path,PathBuf};
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
