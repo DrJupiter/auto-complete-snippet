@@ -12,6 +12,7 @@ mod tests {
     }
 
     #[test]
+    #[should_panic(expected = "This test will panic")]
     fn another_test() {
         panic!("This test will panic and fail");
     }
@@ -58,6 +59,27 @@ mod tests {
             Err(String::from("two plus two does not equal four"))
         }
     }
+
+   #[test]
+   fn read_lines_test() {
+
+        if let Ok(lines) = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets"){
+            for line in lines{
+                if let Ok(_current_line) = line {
+                }
+                else {
+                    panic!("Unable to read line");
+                }
+            }
+        } 
+   }
+
+   #[test]
+   fn pattern_vec_creation() {
+       let file_buffer = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets");
+       vec_from_pattern(&file_buffer);
+   }
+
 }
 
 #[derive(Debug)]
@@ -112,13 +134,43 @@ impl Guess {
 // In both cases I have to implement a file searcher which searches line by line after a certain
 // criteria. 
 
-fn pattern_finder(file: Buffer, pattern: regex) -> Vec::<str> {
-    todo!()
-}
+// fn pattern_finder(file: Buffer, pattern: regex) -> Vec::<str> {
+//     todo!()
+// }
 
-fn sorter(complete_options: Vec::<str>, current_text: mut String) -> String {
-todo!()
-}
+// fn sorter(complete_options: Vec::<str>, current_text: mut String) -> String {
+// todo!()
+// }
 
 // Possibly look into vim pop up menus, but I'm pretty sure that could just be implemented in rust
 // or python pretty easily.
+
+// Cases:
+// Regex
+// snippet "f[\;|æ]+kvivalentdosis" "Ækvivalent dosis" riA
+// Normal
+// snippet fmindskningafintensitet "I prop to k"
+
+use std::fs::File;
+use std::io::{self, BufRead};
+use std::path::Path;
+
+fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
+where P: AsRef<Path>, {
+    let file = File::open(filename)?;
+    Ok(io::BufReader::new(file).lines())
+}
+
+// Maybe this should be changed later, since I don't think we will need the buffer more than once.
+fn vec_from_pattern<'a>(lines: &'a io::Result<io::Lines<io::BufReader<File>>>) -> Vec::<&'a str> {
+
+match lines {
+    Ok(lines_iter) => println!("{:?}", lines_iter),
+    Err(err) => eprintln!("{}", err)
+}
+
+let tmp: &'a str = "tmp";
+
+vec![tmp]
+
+}
