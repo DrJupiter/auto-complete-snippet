@@ -60,27 +60,28 @@ mod tests {
         }
     }
 
-   #[test]
-   fn read_lines_test() {
-
-        if let Ok(lines) = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets"){
-            for line in lines{
+    #[test]
+    fn read_lines_test() {
+        if let Ok(lines) = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets") {
+            for line in lines {
                 if let Ok(_current_line) = line {
-                }
-                else {
+                } else {
                     panic!("Unable to read line");
                 }
             }
-        } 
-   }
+        }
+    }
 
-   #[test]
-   fn pattern_vec_creation() {
-       let file_buffer = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets");
-       vec_from_pattern(&file_buffer);
-   }
-
+    #[test]
+    fn pattern_vec_creation() {
+        let mut file_buffer = read_lines("/home/winter/.config/nvim/UltiSnips/tex.snippets");
+        vec_from_pattern(&mut file_buffer);
+    }
 }
+
+extern crate regex;
+
+use regex::Regex;
 
 #[derive(Debug)]
 struct Triangle {
@@ -94,7 +95,6 @@ impl Triangle {
         self.base == self.side_one && self.side_one == self.side_two
     }
 }
-
 
 pub struct Guess {
     value: u32,
@@ -127,12 +127,12 @@ impl Guess {
 
 // Path 2:
 
-// Implement the auto completion as a part of the rust code as well, so all you call in python would be 
+// Implement the auto completion as a part of the rust code as well, so all you call in python would be
 // snippet.analyze("path/to/file","regex","optional_parameter:return_formart")
 // then based on the match we pass it to rust code that auto completes and returns a string on enter or something.
 
 // In both cases I have to implement a file searcher which searches line by line after a certain
-// criteria. 
+// criteria.
 
 // fn pattern_finder(file: Buffer, pattern: regex) -> Vec::<str> {
 //     todo!()
@@ -156,21 +156,32 @@ use std::io::{self, BufRead};
 use std::path::Path;
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
-where P: AsRef<Path>, {
+where
+    P: AsRef<Path>,
+{
     let file = File::open(filename)?;
     Ok(io::BufReader::new(file).lines())
 }
 
 // Maybe this should be changed later, since I don't think we will need the buffer more than once.
-fn vec_from_pattern<'a>(lines: &'a io::Result<io::Lines<io::BufReader<File>>>) -> Vec::<&'a str> {
+fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<&'a str> {
 
-match lines {
-    Ok(lines_iter) => println!("{:?}", lines_iter),
-    Err(err) => eprintln!("{}", err)
-}
+    let test_re: Regex = Regex::new("^snippet").unwrap();
 
-let tmp: &'a str = "tmp";
+    match lines {
+        Ok(lines_iter) => {
+            for line in lines_iter {
+                if let Ok(line) = line {
+                    if test_re.is_match(&line) {
+                        println!("found snippet: {}", &line);
+                    }
+                }
+            }
+        }
+        Err(err) => eprintln!("{}", err),
+    }
 
-vec![tmp]
+    let tmp: &'a str = "tmp";
 
+    vec![tmp]
 }
