@@ -78,6 +78,17 @@ mod tests {
         let mut file_buffer = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets");
         dbg!(vec_from_pattern(&mut file_buffer));
     }
+
+    #[test]
+    fn fysik_re (){
+
+        let test_end_re: Regex = Regex::new(r"\w+$").unwrap();
+        let test_end_re_re: Regex = Regex::new(r"[r]").unwrap();
+        dbg!(test_end_re.captures("\"some description\" riA").unwrap().get(0).map_or("", |m| m.as_str())); 
+
+
+    }
+
 }
 
 
