@@ -76,7 +76,7 @@ mod tests {
     #[test]
     fn pattern_vec_creation() {
         let mut file_buffer = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets");
-        vec_from_pattern(&mut file_buffer);
+        dbg!(vec_from_pattern(&mut file_buffer));
     }
 }
 
@@ -165,16 +165,19 @@ where
 }
 
 // Maybe this should be changed later, since I don't think we will need the buffer more than once.
-fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<&'a str> {
+fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<String> {
 
     let test_re: Regex = Regex::new("^snippet").unwrap();
-
+    
+    let mut vec_re_matches = Vec::new();
+    
     match lines {
         Ok(lines_iter) => {
             for line in lines_iter {
                 if let Ok(line) = line {
                     if test_re.is_match(&line) {
                         println!("found snippet: {}", &line);
+                        vec_re_matches.push(line);
                     }
                 }
             }
@@ -182,7 +185,10 @@ fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) 
         Err(err) => eprintln!("{}", err),
     }
 
-    let tmp: &'a str = "tmp";
+//    let tmp: &'a str = "tmp";
 
-    vec![tmp]
+ //   vec![tmp];
+
+    return vec_re_matches
 }
+
