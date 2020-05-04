@@ -111,11 +111,17 @@ mod tests {
     }
 
     #[test]
-    fn fysik_re_construction () -> Result<Regex,String>{
+    fn fysik_re_construction () -> Result<(),String>{
 
         let snippet_regex = "snippet \"f[\\;|æ]+kvivalentdosis\" \"Ækvivalent dosis\" riA";
-         
-        todo!()
+        
+        if let Ok(RE) = Regex::new(r"f[\;|æ]+kvivalentdosis"){
+            Ok(())
+        }
+        else {
+            Err(String::from("Failed to create regular expression"))
+        }
+        
 
     }
 
