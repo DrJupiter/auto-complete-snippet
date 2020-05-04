@@ -62,7 +62,6 @@ mod tests {
 
     #[test]
     fn read_lines_test() {
-
         if let Ok(lines) = read_lines("/home/klaus/.config/nvim/UltiSnips/tex.snippets") {
             for line in lines {
                 if let Ok(_current_line) = line {
@@ -80,17 +79,47 @@ mod tests {
     }
 
     #[test]
-    fn fysik_re (){
-
+    fn fysik_re() {
         let test_end_re: Regex = Regex::new(r"\w+$").unwrap();
         let test_end_re_re: Regex = Regex::new(r"[r]").unwrap();
-        dbg!(test_end_re.captures("\"some description\" riA").unwrap().get(0).map_or("", |m| m.as_str())); 
+        let snippet_no_regex = "snippet fmindskningafintensitet \"I prop to k\" iA";
+        let snippet_regex = "snippet \"f[\\;|æ]+kvivalentdosis\" \"Ækvivalent dosis\" riA";
+        // assert!(!dbg!(test_end_re_re.is_match(test_end_re.captures(snippet_no_regex).unwrap().get(0).map_or("", |m| m.as_str()))));
 
+        // Im pretty sure that the second match in redundant, since we are guarenteed
+        // to have a capture if we get some match back.
+        // So we should just capture.unwrap();
+        if let Some(capture) = test_end_re.captures(snippet_no_regex) {
+            match capture.get(0) {
+                Some(capture) => match test_end_re_re.is_match(capture.as_str()) {
+                    false => (),
+                    true => panic!("This should not match as an RE"),
+                },
+                None => println!("No match found at end"),
+            };
+        }
+
+        if let Some(capture) = test_end_re.captures(snippet_regex) {
+            match capture.get(0) {
+                Some(capture) => match test_end_re_re.is_match(capture.as_str()) {
+                    true => (),
+                    false => panic!("Match, but not RE"),
+                },
+                None => panic!(),
+            };
+        }
+    }
+
+    #[test]
+    fn fysik_re_construction () -> Result<Regex,String>{
+
+        let snippet_regex = "snippet \"f[\\;|æ]+kvivalentdosis\" \"Ækvivalent dosis\" riA";
+         
+        todo!()
 
     }
 
 }
-
 
 #[derive(Debug)]
 struct Triangle {
@@ -158,14 +187,13 @@ impl Guess {
 // Regex
 // snippet "f[\;|æ]+kvivalentdosis" "Ækvivalent dosis" riA
 // Normal
-// snippet fmindskningafintensitet "I prop to k"
-
+// snippet fmindskningafintensitet "I prop to k" iA
 
 use regex::Regex;
 
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::{Path,PathBuf};
+use std::path::{Path, PathBuf};
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
@@ -177,11 +205,10 @@ where
 
 // Maybe this should be changed later, since I don't think we will need the buffer more than once.
 fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<String> {
-
     let test_re: Regex = Regex::new("^snippet").unwrap();
-    
+
     let mut vec_re_matches = Vec::new();
-    
+
     match lines {
         Ok(lines_iter) => {
             for line in lines_iter {
@@ -196,10 +223,9 @@ fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) 
         Err(err) => eprintln!("{}", err),
     }
 
-//    let tmp: &'a str = "tmp";
+    //    let tmp: &'a str = "tmp";
 
- //   vec![tmp];
+    //   vec![tmp];
 
-    return vec_re_matches
+    return vec_re_matches;
 }
-
