@@ -114,8 +114,13 @@ mod tests {
     fn fysik_re_construction () -> Result<(),String>{
 
         let snippet_regex = "snippet \"f[\\;|æ]+kvivalentdosis\" \"Ækvivalent dosis\" riA";
-        
-        if let Ok(RE) = Regex::new(r"f[\;|æ]+kvivalentdosis"){
+       
+        let re_capture: Regex = Regex::new(r"(.*?)").unwrap();
+
+//        dbg!((re_capture.captures(snippet_regex).unwrap().get(1)));
+
+        if let Ok(RE) = Regex::new(r"f[\\;|æ]+kvivalentdosis"){
+           dbg!(RE.is_match("f;kvivalentdosis"));
             Ok(())
         }
         else {
