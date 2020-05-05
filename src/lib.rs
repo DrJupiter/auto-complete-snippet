@@ -111,25 +111,20 @@ mod tests {
     }
 
     #[test]
-    fn fysik_re_construction () -> Result<(),String>{
-
+    fn fysik_re_construction() -> Result<(), String> {
         let snippet_regex = "snippet \"f[\\;|æ]+kvivalentdosis\" \"Ækvivalent dosis\" riA";
-       
-        let re_capture: Regex = Regex::new(r"(.*?)").unwrap();
 
-//        dbg!((re_capture.captures(snippet_regex).unwrap().get(1)));
+        let re_capture: Regex = Regex::new("\"(.+?)\"").unwrap();
 
-        if let Ok(RE) = Regex::new(r"f[\\;|æ]+kvivalentdosis"){
-           dbg!(RE.is_match("f;kvivalentdosis"));
-            Ok(())
+        let first_capture = re_capture.captures(snippet_regex).unwrap().get(1).unwrap();
+
+        if let Ok(RE) = Regex::new(&first_capture.as_str().escape_default().to_string().as_str()) {
+            return Ok(());
+        } else {
+            return Err(String::from("Failed to construct regex from match"));
         }
-        else {
-            Err(String::from("Failed to create regular expression"))
-        }
-        
-
+        //        println!("Not escaped: {}\n Escaped: {}", first_capture.as_str(),first_capture.as_str().escape_default().to_string().as_str());
     }
-
 }
 
 #[derive(Debug)]
