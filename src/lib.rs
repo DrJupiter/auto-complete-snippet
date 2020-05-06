@@ -116,6 +116,8 @@ mod tests {
 
         let re_capture: Regex = Regex::new("\"(.+?)\"").unwrap();
 
+        dbg!(&re_capture);
+
         let first_capture = re_capture.captures(snippet_regex).unwrap().get(1).unwrap();
 
         if let Ok(RE) = Regex::new(&first_capture.as_str().escape_default().to_string().as_str()) {
@@ -211,7 +213,13 @@ where
 
 // Maybe this should be changed later, since I don't think we will need the buffer more than once.
 fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<String> {
-    let test_re: Regex = Regex::new("^snippet").unwrap();
+    let snippet_finder_re: Regex = Regex::new("^snippet").unwrap();
+
+    // Constructed different regex
+    //    let options_re: Regex = Regex::new(r"\w+$").unwrap();
+    //    let is_re: Regex = Regex::new(r"[r]").unwrap();
+    let test_re: Regex = Regex::new(r"\w*?r\w*?$").unwrap();
+    let re_capture: Regex = Regex::new("\"(.+?)\"").unwrap();
 
     let mut vec_re_matches = Vec::new();
 
@@ -219,7 +227,7 @@ fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) 
         Ok(lines_iter) => {
             for line in lines_iter {
                 if let Ok(line) = line {
-                    if test_re.is_match(&line) {
+                    if snippet_finder_re.is_match(&line) {
                         println!("found snippet: {}", &line);
                         vec_re_matches.push(line);
                     }
