@@ -199,6 +199,9 @@ impl Guess {
 
 use regex::Regex;
 
+#[macro_use]
+extern crate lazy_static;
+
 use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::{Path, PathBuf};
@@ -213,14 +216,20 @@ where
 
 // Maybe this should be changed later, since I don't think we will need the buffer more than once.
 fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<String> {
-    let snippet_finder_re: Regex = Regex::new("^snippet").unwrap();
-
     // Constructed different regex
     //    let options_re: Regex = Regex::new(r"\w+$").unwrap();
     //    let is_re: Regex = Regex::new(r"[r]").unwrap();
-    let test_re: Regex = Regex::new(r"\w*?r\w*?$").unwrap();
-    let re_capture: Regex = Regex::new("\"(.+?)\"").unwrap();
 
+    //    lazy_static! {
+    //        static ref RE: Regex = Regex::new("...").unwrap();
+    //    }
+    //^\w+ (\S+)
+    lazy_static! {
+        static ref snippet_finder_re: Regex = Regex::new("^snippet").unwrap();
+        static ref test_re: Regex = Regex::new(r"r\w*?$").unwrap();
+        static ref re_capture: Regex = Regex::new("\"(.+?)\"").unwrap();
+        static ref normal_capture: Regex = Regex::new(r"^\w+ (\S+)").unwrap();
+    }
     let mut vec_re_matches = Vec::new();
 
     match lines {
@@ -228,8 +237,12 @@ fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) 
             for line in lines_iter {
                 if let Ok(line) = line {
                     if snippet_finder_re.is_match(&line) {
-                        println!("found snippet: {}", &line);
-                        vec_re_matches.push(line);
+                        if test_re.is_match(&line) {
+                            println!("found regex snippet: {}", &line)
+                        } else {
+                            println!("found snippet: {}", &line);
+                            vec_re_matches.push(line);
+                        }
                     }
                 }
             }
