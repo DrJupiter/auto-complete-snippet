@@ -206,9 +206,6 @@ use std::fs::File;
 use std::io::{self, BufRead};
 use std::path::{Path};
 
-use pyo3::prelude::*;
-use pyo3::wrap_pyfunction;
-
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
     P: AsRef<Path>,
