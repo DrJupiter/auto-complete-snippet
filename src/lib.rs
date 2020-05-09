@@ -79,9 +79,16 @@ fn init_py<'a>(path: &'a str) -> PyResult<Vec<String>> {
     }
 }
 
+#[pyfunction]
+/// Should panic
+fn another_test() {
+    panic!("This test will panic and fail");
+}
+
 #[pymodule]
 /// A Python module implemented in Rust.
 fn rust_sp_snippet_finder(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(init_py))?;
+    m.add_wrapped(wrap_pyfunction!(another_test))?;
     Ok(())
 }
