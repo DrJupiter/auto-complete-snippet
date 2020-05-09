@@ -118,7 +118,7 @@ mod tests {
 
         dbg!(&re_capture);
 
-        let first_capture = re_capture.captures(snippet_regex).unwrap().get(1).unwrap();
+        let first_capture = RE_CAPTURE.captures(snippet_regex).unwrap().get(1).unwrap();
 
         if let Ok(RE) = Regex::new(&first_capture.as_str().escape_default().to_string().as_str()) {
             return Ok(());
@@ -204,7 +204,10 @@ extern crate lazy_static;
 
 use std::fs::File;
 use std::io::{self, BufRead};
-use std::path::{Path, PathBuf};
+use std::path::{Path};
+
+use pyo3::prelude::*;
+use pyo3::wrap_pyfunction;
 
 fn read_lines<P>(filename: P) -> io::Result<io::Lines<io::BufReader<File>>>
 where
@@ -214,34 +217,32 @@ where
     Ok(io::BufReader::new(file).lines())
 }
 
-// Maybe this should be changed later, since I don't think we will need the buffer more than once.
-fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<String> {
-    // Constructed different regex
-    //    let options_re: Regex = Regex::new(r"\w+$").unwrap();
-    //    let is_re: Regex = Regex::new(r"[r]").unwrap();
+lazy_static! {
+    static ref SNIPPET_FINDER_RE: Regex = Regex::new("^snippet").unwrap();
+    static ref TEST_RE: Regex = Regex::new(r"r\w*?$").unwrap();
+    static ref RE_CAPTURE: Regex = Regex::new("\"(.+?)\"").unwrap();
+    static ref NORMAL_CAPTURE: Regex = Regex::new(r"^\w+ (\S+)").unwrap();
+    static ref RE_DELIMETER_CAPTURE: Regex = Regex::new(r"\|(\S+)\|").unwrap();
+}
 
-    //    lazy_static! {
-    //        static ref RE: Regex = Regex::new("...").unwrap();
-    //    }
-    //^\w+ (\S+)
-    lazy_static! {
-        static ref snippet_finder_re: Regex = Regex::new("^snippet").unwrap();
-        static ref test_re: Regex = Regex::new(r"r\w*?$").unwrap();
-        static ref re_capture: Regex = Regex::new("\"(.+?)\"").unwrap();
-        static ref normal_capture: Regex = Regex::new(r"^\w+ (\S+)").unwrap();
-    }
+// Maybe this should be changed later, since I don't think we will need the buffer more than once.
+/// Creates a vector 
+fn vec_from_pattern<'a>(lines: &mut io::Result<io::Lines<io::BufReader<File>>>) -> Vec<String> {
+
     let mut vec_re_matches = Vec::new();
 
     match lines {
         Ok(lines_iter) => {
             for line in lines_iter {
                 if let Ok(line) = line {
-                    if snippet_finder_re.is_match(&line) {
-                        if test_re.is_match(&line) {
-                            println!("found regex snippet: {}", &line)
+                    if SNIPPET_FINDER_RE.is_match(&line) {
+                        if TEST_RE.is_match(&line) {
+                              vec_re_matches.push(RE_DELIMETER_CAPTURE.captures(&line).unwrap().get(1).unwrap().as_str().into());  
+//                            let tmp = RE_DELIMETER_CAPTURE.captures(&line).unwrap().get(0).unwrap().as_str();
+//                            println!("found regex snippet: {}\n with valid form: {}", &line,&tmp);
                         } else {
-                            println!("found snippet: {}", &line);
-                            vec_re_matches.push(line);
+//                            println!("found snippet: {}", &line);
+                            vec_re_matches.push(NORMAL_CAPTURE.captures(&line).unwrap().get(1).unwrap().as_str().into());
                         }
                     }
                 }
