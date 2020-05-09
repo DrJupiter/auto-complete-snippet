@@ -10,7 +10,7 @@ use regex::Regex;
 extern crate lazy_static;
 
 use std::fs::{File};
-use std::io::{self, BufRead};
+use std::io::{self, BufRead,Error,ErrorKind};
 use std::path::Path;
 
 use pyo3::prelude::*;
@@ -26,7 +26,7 @@ where
     Ok(io::BufReader::new(file).lines())
     }
     else {
-        Err(String::from("No valid file recieved"))
+        Err(Error::new(ErrorKind::InvalidInput,"Not a file"))
     }
 }
 
@@ -76,23 +76,17 @@ fn vec_from_pattern<'a>(lines: &mut io::Lines<io::BufReader<File>>) -> Vec<Strin
 #[pyfunction]
 ///Returns a list with all matched items in the file.
 fn init_py<'a>(path: &'a str) -> PyResult<Vec<String>> {
-    println!("We make it to here 1");
     let file_buffer = read_lines(path);
-    println!("We make it to here 2");
 
     if let Ok(mut succesful_file_read) = file_buffer {
-        println!("We make it here 3");
-        dbg!(succesful_file_read);
-        //Ok(vec_from_pattern(&mut succesful_file_read))
-        Ok(vec![String::from("Failed to read file")])
+        Ok(vec_from_pattern(&mut succesful_file_read))
 
     } else {
-        println!("We make it here 4");
         Ok(vec![String::from("Failed to read file")])
     }
 }
 
-#[pyfunction]
+//#[pyfunction]
 /// Should panic
 fn another_test() {
     println!("We can print");
@@ -103,6 +97,6 @@ fn another_test() {
 /// A Python module implemented in Rust.
 fn rust_sp_snippet_finder(py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(init_py))?;
-    m.add_wrapped(wrap_pyfunction!(another_test))?;
+ //   m.add_wrapped(wrap_pyfunction!(another_test))?;
     Ok(())
 }
