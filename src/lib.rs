@@ -9,7 +9,7 @@ use regex::Regex;
 #[macro_use]
 extern crate lazy_static;
 
-use std::fs::File;
+use std::fs::{File};
 use std::io::{self, BufRead};
 use std::path::Path;
 
@@ -21,7 +21,13 @@ where
     P: AsRef<Path>,
 {
     let file = File::open(filename)?;
+    let file_metadata = file.metadata()?;
+    if file_metadata.is_file() {
     Ok(io::BufReader::new(file).lines())
+    }
+    else {
+        Err(String::from("No valid file recieved"))
+    }
 }
 
 lazy_static! {
@@ -70,11 +76,18 @@ fn vec_from_pattern<'a>(lines: &mut io::Lines<io::BufReader<File>>) -> Vec<Strin
 #[pyfunction]
 ///Returns a list with all matched items in the file.
 fn init_py<'a>(path: &'a str) -> PyResult<Vec<String>> {
+    println!("We make it to here 1");
     let file_buffer = read_lines(path);
+    println!("We make it to here 2");
 
     if let Ok(mut succesful_file_read) = file_buffer {
-        Ok(vec_from_pattern(&mut succesful_file_read))
+        println!("We make it here 3");
+        dbg!(succesful_file_read);
+        //Ok(vec_from_pattern(&mut succesful_file_read))
+        Ok(vec![String::from("Failed to read file")])
+
     } else {
+        println!("We make it here 4");
         Ok(vec![String::from("Failed to read file")])
     }
 }
@@ -82,6 +95,7 @@ fn init_py<'a>(path: &'a str) -> PyResult<Vec<String>> {
 #[pyfunction]
 /// Should panic
 fn another_test() {
+    println!("We can print");
     panic!("This test will panic and fail");
 }
 
