@@ -4,6 +4,8 @@
 // Normal
 // snippet fmindskningafintensitet "I prop to k" iA
 
+//TODO add error handling for regex without optional completion
+
 use regex::Regex;
 
 #[macro_use]
