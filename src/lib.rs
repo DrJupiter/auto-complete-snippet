@@ -11,8 +11,8 @@ use regex::Regex;
 #[macro_use]
 extern crate lazy_static;
 
-use std::fs::{File};
-use std::io::{self, BufRead,Error,ErrorKind};
+use std::fs::File;
+use std::io::{self, BufRead, Error, ErrorKind};
 use std::path::Path;
 
 use pyo3::prelude::*;
@@ -25,10 +25,9 @@ where
     let file = File::open(filename)?;
     let file_metadata = file.metadata()?;
     if file_metadata.is_file() {
-    Ok(io::BufReader::new(file).lines())
-    }
-    else {
-        Err(Error::new(ErrorKind::InvalidInput,"Not a file"))
+        Ok(io::BufReader::new(file).lines())
+    } else {
+        Err(Error::new(ErrorKind::InvalidInput, "Not a file"))
     }
 }
 
@@ -49,16 +48,12 @@ fn vec_from_pattern<'a>(lines: &mut io::Lines<io::BufReader<File>>) -> Vec<Strin
         if let Ok(line) = line {
             if SNIPPET_FINDER_RE.is_match(&line) {
                 if TEST_RE.is_match(&line) {
-                    vec_re_matches.push(
-                        RE_DELIMETER_CAPTURE
-                            .captures(&line)
-                            .unwrap()
-                            .get(1)
-                            .unwrap()
-                            .as_str()
-                            .into(),
-                    );
+                    if let Some(cap) = RE_DELIMETER_CAPTURE.captures(&line) {
+                        vec_re_matches.push(cap.get(1).unwrap().as_str().into());
+                    }
+                //                    vec_re_matches.push(RE_DELIMETER_CAPTURE.captures(&line).unwrap().get(1).unwrap().as_str().into());
                 } else {
+                    println!("Line: {}\n Norm cap:{:?}",&line, NORMAL_CAPTURE.captures(&line));
                     vec_re_matches.push(
                         NORMAL_CAPTURE
                             .captures(&line)
@@ -82,7 +77,6 @@ fn init_py<'a>(path: &'a str) -> PyResult<Vec<String>> {
 
     if let Ok(mut succesful_file_read) = file_buffer {
         Ok(vec_from_pattern(&mut succesful_file_read))
-
     } else {
         Ok(vec![String::from("Failed to read file")])
     }
@@ -99,6 +93,6 @@ fn init_py<'a>(path: &'a str) -> PyResult<Vec<String>> {
 /// A Python module implemented in Rust.
 fn rust_sp_snippet_finder(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_wrapped(wrap_pyfunction!(init_py))?;
- //   m.add_wrapped(wrap_pyfunction!(another_test))?;
+    //   m.add_wrapped(wrap_pyfunction!(another_test))?;
     Ok(())
 }
