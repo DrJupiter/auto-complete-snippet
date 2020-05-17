@@ -32,7 +32,7 @@ where
 }
 
 lazy_static! {
-    static ref SNIPPET_FINDER_RE: Regex = Regex::new("^snippet").unwrap();
+    static ref SNIPPET_FINDER_RE: Regex = Regex::new(r"^snippet\s").unwrap();
     static ref TEST_RE: Regex = Regex::new(r"r\w*?$").unwrap();
     static ref RE_CAPTURE: Regex = Regex::new("\"(.+?)\"").unwrap();
     static ref NORMAL_CAPTURE: Regex = Regex::new(r"^\w+ (\S+)").unwrap();
@@ -49,11 +49,11 @@ fn vec_from_pattern<'a>(lines: &mut io::Lines<io::BufReader<File>>) -> Vec<Strin
             if SNIPPET_FINDER_RE.is_match(&line) {
                 if TEST_RE.is_match(&line) {
                     if let Some(cap) = RE_DELIMETER_CAPTURE.captures(&line) {
-                        vec_re_matches.push(cap.get(1).unwrap().as_str().into());
+                        vec_re_matches.push(cap.get(cap.len() - 1).unwrap().as_str().into());
                     }
                 //                    vec_re_matches.push(RE_DELIMETER_CAPTURE.captures(&line).unwrap().get(1).unwrap().as_str().into());
                 } else {
-                    println!("Line: {}\n Norm cap:{:?}",&line, NORMAL_CAPTURE.captures(&line));
+//                    println!("Line: {}\n Norm cap:{:?}",&line, NORMAL_CAPTURE.captures(&line));
                     vec_re_matches.push(
                         NORMAL_CAPTURE
                             .captures(&line)
