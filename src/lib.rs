@@ -6,6 +6,24 @@
 
 //TODO add error handling for regex without optional completion
 
+#[cfg(test)]
+mod tests{
+
+    use super::*;
+
+    #[test]
+    fn weird_case() {
+        let string = "snippet \"faj[;|æ]vncirkel(v|T)\" \"Acceleration i jævn cirkel bevægelse |fajævncirkel|\" riA";
+        for i in RE_DELIMETER_CAPTURE.captures_iter(string) {
+            println!("{:?}",i);
+        }
+        let cap = RE_DELIMETER_CAPTURE.captures(string).unwrap();
+        println!("length of captures {:?}, captures {:#?}", cap.len(), cap);
+        dbg!(RE_DELIMETER_CAPTURE.captures_iter(string).last());       
+    }
+
+}
+
 use regex::Regex;
 
 #[macro_use]
@@ -48,12 +66,10 @@ fn vec_from_pattern<'a>(lines: &mut io::Lines<io::BufReader<File>>) -> Vec<Strin
         if let Ok(line) = line {
             if SNIPPET_FINDER_RE.is_match(&line) {
                 if TEST_RE.is_match(&line) {
-                    if let Some(cap) = RE_DELIMETER_CAPTURE.captures(&line) {
-                        vec_re_matches.push(cap.get(cap.len() - 1).unwrap().as_str().into());
+                    if let Some(cap) = RE_DELIMETER_CAPTURE.captures_iter(&line).last() {
+                        vec_re_matches.push(cap.get(1).unwrap().as_str().into());
                     }
-                //                    vec_re_matches.push(RE_DELIMETER_CAPTURE.captures(&line).unwrap().get(1).unwrap().as_str().into());
                 } else {
-//                    println!("Line: {}\n Norm cap:{:?}",&line, NORMAL_CAPTURE.captures(&line));
                     vec_re_matches.push(
                         NORMAL_CAPTURE
                             .captures(&line)
